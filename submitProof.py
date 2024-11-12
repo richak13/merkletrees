@@ -118,10 +118,11 @@ def get_account():
 
 def get_contract_info(chain):
     """
-        Returns a contract address and contract abi from "contract_info.json"
-        for the given chain
+    Returns a contract address and contract ABI from "contract_info.json"
+    for the given chain.
     """
-    cur_dir = Path(__file__).parent.absolute()
+    # Update path as necessary
+    cur_dir = Path("/home/codio/workspace/")
     with open(cur_dir.joinpath("contract_info.json"), "r") as f:
         d = json.load(f)
         d = d[chain]
