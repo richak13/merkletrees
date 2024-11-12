@@ -51,21 +51,26 @@ def build_merkle(leaves):
     tree[-1][0] = HexBytes(tree[-1][0])
     return tree
 
-def prove_merkle(merkle_tree, random_indx):
+def prove_merkle(merkle_tree, leaf_index):
     """
-    Generates a Merkle proof for the leaf at `random_indx` in the Merkle Tree.
+    Generates a Merkle proof for the leaf at `leaf_index` in the Merkle Tree.
     The proof is a list of sibling nodes required to reconstruct the path to the root.
     """
     proof = []
-    leaf_index = random_indx
-    
-    for layer in merkle_tree[:-1]:  # Skip the root layer
-        sibling_index = leaf_index ^ 1  # XOR with 1 to get the sibling index
+    index = leaf_index
+
+    for layer in merkle_tree[:-1]:  # Exclude the root layer
+        sibling_index = index ^ 1  # XOR with 1 to get the sibling index
         if sibling_index < len(layer):
-            proof.append(layer[sibling_index])
-        leaf_index //= 2  # Move up to the next level
+            proof.append(layer[sibling_index])  # Append the sibling to the proof
+        else:
+            # Handle case where there is no sibling (duplicate last node in odd layer)
+            proof.append(layer[index])
+        
+        index //= 2  # Move up to the next level in the tree
     
     return proof
+
 
 def prove_merkle(merkle_tree, leaf_index):
     proof = []
