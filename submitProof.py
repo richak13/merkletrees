@@ -102,7 +102,7 @@ def send_signed_msg(proof, random_leaf):
     signed_tx = w3.eth.account.sign_transaction(transaction, acct.key)
 
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)  # Corrected method name
-    return w3.toHex(tx_hash)
+    return hex(tx_hash)
 
 
 # Helper functions that do not need to be modified
