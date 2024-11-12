@@ -138,7 +138,12 @@ def get_account():
     return eth_account.Account.from_key(sk)
 
 def get_contract_info(chain):
-    cur_dir = Path(__file__).parent.absolute()
+    """
+    Returns a contract address and contract ABI from "contract_info.json"
+    for the given chain.
+    """
+    # Update path as necessary
+    cur_dir = Path("/home/codio/workspace/")
     with open(cur_dir.joinpath("contract_info.json"), "r") as f:
         d = json.load(f)
         d = d[chain]
