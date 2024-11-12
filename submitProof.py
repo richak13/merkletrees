@@ -62,11 +62,14 @@ def prove_merkle(merkle_tree, random_indx):
     for layer in merkle_tree[:-1]:  # Skip the root layer
         sibling_index = leaf_index ^ 1  # XOR with 1 to get the sibling index
         if sibling_index < len(layer):
-            proof.append(layer[sibling_index])  # Append the sibling hash to the proof
+            # Ensure sibling comes in correct order (consistent with Merkle tree hashing)
+            if leaf_index < sibling_index:
+                proof.append(layer[sibling_index])
+            else:
+                proof.append(layer[leaf_index])
         leaf_index //= 2  # Move up to the next level
     
     return proof
-
 
 def sign_challenge(challenge):
     acct = get_account()
