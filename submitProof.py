@@ -36,6 +36,18 @@ def generate_primes(num_primes):
 def convert_leaves(primes_list):
     return [int.to_bytes(prime, (prime.bit_length() + 7) // 8, 'big').rjust(32, b'\x00') for prime in primes_list]
 
+def hash_pair(a, b):
+    """
+        Hashes a pair of bytes32 values in sorted order to ensure consistency.
+        Uses keccak_256, similar to Solidity's keccak256.
+    """
+    hasher = keccak.new(digest_bits=256)
+    # Sort the pair to maintain consistency (Merkle trees require ordered hashing)
+    hasher.update(a if a < b else b)
+    hasher.update(b if a < b else a)
+    return hasher.digest()
+
+
 def build_merkle(leaves):
     tree = [leaves]
     while len(tree[-1]) > 1:
