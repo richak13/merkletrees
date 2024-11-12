@@ -67,6 +67,24 @@ def prove_merkle(merkle_tree, random_indx):
     
     return proof
 
+def prove_merkle(merkle_tree, leaf_index):
+    proof = []
+    index = leaf_index
+    for layer in merkle_tree[:-1]:  # Exclude the root layer
+        if index % 2 == 0:
+            sibling_index = index + 1 if index + 1 < len(layer) else index
+        else:
+            sibling_index = index - 1
+        
+        # Append the sibling to the proof
+        proof.append(layer[sibling_index])
+        
+        # Move up to the next level in the tree
+        index //= 2
+    return proof
+
+
+
 def sign_challenge(challenge):
     acct = get_account()
     addr = acct.address
