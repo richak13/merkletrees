@@ -95,7 +95,7 @@ def send_signed_msg(proof, random_leaf):
         'data': tx_data,
         'gas': 200000,
         'gasPrice': w3.eth.gas_price,
-        'nonce': w3.eth.getTransactionCount(acct.address),
+        'nonce': w3.eth.get_transaction_count(acct.address),  # Corrected method name
     }
     
     # Sign and send the transaction
@@ -103,10 +103,6 @@ def send_signed_msg(proof, random_leaf):
     tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction)
     
     return w3.toHex(tx_hash)
-
-
-
-
 
 
 # Helper functions that do not need to be modified
