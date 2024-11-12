@@ -52,14 +52,21 @@ def build_merkle(leaves):
     return tree
 
 def prove_merkle(merkle_tree, random_indx):
+    """
+    Generates a Merkle proof for the leaf at `random_indx` in the Merkle Tree.
+    The proof is a list of sibling nodes required to reconstruct the path to the root.
+    """
     proof = []
     leaf_index = random_indx
-    for layer in merkle_tree[:-1]:
-        sibling_index = leaf_index ^ 1
-        if sibling_index < len(layer):  # Ensure sibling exists
-            proof.append(layer[sibling_index])
-        leaf_index //= 2
+    
+    for layer in merkle_tree[:-1]:  # Skip the root layer
+        sibling_index = leaf_index ^ 1  # XOR with 1 to get the sibling index
+        if sibling_index < len(layer):
+            proof.append(layer[sibling_index])  # Append the sibling hash to the proof
+        leaf_index //= 2  # Move up to the next level
+    
     return proof
+
 
 def sign_challenge(challenge):
     acct = get_account()
