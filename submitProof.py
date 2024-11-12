@@ -75,11 +75,13 @@ def send_signed_msg(proof, random_leaf):
     w3 = connect_to(chain)
     contract = w3.eth.contract(address=address, abi=abi)
     
-    # Convert the proof and leaf if necessary to bytes32 format
-    leaf_bytes = Web3.toBytes(random_leaf)
-    proof_bytes = [Web3.toBytes(item) for item in proof]
+    # Convert random_leaf to bytes32 format (32 bytes)
+    leaf_bytes = random_leaf.to_bytes(32, byteorder='big')
     
-    # Build the transaction data manually
+    # Convert each item in the proof to bytes32 format
+    proof_bytes = [bytes(item) if isinstance(item, bytes) else item.to_bytes(32, byteorder='big') for item in proof]
+    
+    # Encode ABI manually for the submit function with proof and leaf arguments
     tx_data = contract.encodeABI(fn_name="submit", args=[proof_bytes, leaf_bytes])
     transaction = {
         'to': address,
@@ -90,13 +92,11 @@ def send_signed_msg(proof, random_leaf):
         'nonce': w3.eth.getTransactionCount(acct.address),
     }
     
-    # Sign the transaction
+    # Sign and send the transaction
     signed_tx = w3.eth.account.sign_transaction(transaction, acct.key)
-    # Send the transaction
     tx_hash = w3.eth.sendRawTransaction(signed_tx.rawTransaction)
     
     return w3.toHex(tx_hash)
-    
 # Helper functions that do not need to be modified
 def connect_to(chain):
     """
