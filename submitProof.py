@@ -131,6 +131,7 @@ def sign_challenge(challenge_text):
 def send_signed_msg(w3, contract, proof, chosen_leaf):
     # Retrieve account and contract details, then send the signed transaction
     account = get_account()
+
     try:
         submit_function = contract.functions.submit
     except AttributeError:
@@ -143,8 +144,8 @@ def send_signed_msg(w3, contract, proof, chosen_leaf):
             'from': account.address,
             'nonce': w3.eth.get_transaction_count(account.address),
             'gas': 500000,
-            'maxFeePerGas': w3.to_wei('20', 'gwei'),
-            'maxPriorityFeePerGas': w3.to_wei('1', 'gwei'),
+            'maxFeePerGas': w3.to_wei('50', 'gwei'),  # Increase from 20 to 50 gwei
+            'maxPriorityFeePerGas': w3.to_wei('2', 'gwei'),  # Increase from 1 to 2 gwei
             'chainId': 97
         })
         signed_tx = w3.eth.account.sign_transaction(tx, account.key)
