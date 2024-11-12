@@ -174,10 +174,16 @@ def get_account():
     return eth_account.Account.from_key(sk[2:] if sk.startswith("0x") else sk)
 
 def get_contract_info(chain):
-    path = Path(__file__).parent.absolute().joinpath("contract_info.json")
-    with open(path, "r") as f:
-        data = json.load(f)
-    return data[chain]['address'], data[chain]['abi']
+    """
+    Returns a contract address and contract ABI from "contract_info.json"
+    for the given chain.
+    """
+    # Update path as necessary
+    cur_dir = Path("/home/codio/workspace/")
+    with open(cur_dir.joinpath("contract_info.json"), "r") as f:
+        d = json.load(f)
+        d = d[chain]
+    return d['address'], d['abi']
 
 def sign_challenge_verify(challenge, address, signature):
     message = eth_account.messages.encode_defunct(text=challenge)
