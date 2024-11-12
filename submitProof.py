@@ -8,22 +8,16 @@ from web3.middleware import geth_poa_middleware
 import math
 
 def merkle_assignment():
-    # Define the number of prime numbers needed for the Merkle tree leaves
     total_primes = 8192
     prime_numbers = generate_primes(total_primes)
-
-    # Verification checks for correct number and last prime
     if len(prime_numbers) != total_primes:
         print(f"Error: Expected {total_primes} primes, but got {len(prime_numbers)}.")
         return
     if prime_numbers[-1] != 84017:
         print(f"Error: The 8192nd prime is {prime_numbers[-1]}, expected 84017.")
         return
-
-    # Convert the prime list into bytes32 format
     leaf_nodes = convert_leaves(prime_numbers)
 
-    # Connect to blockchain
     blockchain = 'bsc'
     w3 = connect_to(blockchain)
     if not w3:
@@ -32,17 +26,14 @@ def merkle_assignment():
     contract_address, contract_abi = get_contract_info(blockchain)
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
-    # Select an unclaimed leaf node for proof
     chosen_leaf_index = select_unclaimed_leaf(w3, contract, leaf_nodes, total_primes)
     if chosen_leaf_index is None:
         print("Error: No unclaimed leaves available.")
         return
 
-    # Build Merkle tree and generate proof
     merkle_tree = build_merkle(leaf_nodes)
     proof = prove_merkle(merkle_tree, chosen_leaf_index)
 
-    # Sign challenge and verify
     challenge_text = ''.join(random.choice(string.ascii_letters) for _ in range(32))
     address, signature = sign_challenge(challenge_text)
 
@@ -56,13 +47,11 @@ def merkle_assignment():
         print("Error: Signature verification failed.")
 
 def generate_primes(count):
-    # Initialize a sieve for prime generation
     sieve_bound = 2000000
     is_prime = [True] * sieve_bound
     is_prime[0:2] = [False, False]
     primes_found = []
 
-    # Sieve of Eratosthenes to identify prime numbers
     for number in range(2, sieve_bound):
         if is_prime[number]:
             primes_found.append(number)
@@ -75,15 +64,12 @@ def generate_primes(count):
     return primes_found
 
 def convert_leaves(prime_list):
-    # Convert each prime to 32-byte representation
     return [prime.to_bytes(32, 'big') for prime in prime_list]
 
 def build_merkle(leaves):
-    # Initialize tree structure with leaves as the first level
     tree_structure = [leaves]
     current_nodes = leaves
 
-    # Iteratively hash pairs of nodes to build the tree up to the root
     while len(current_nodes) > 1:
         next_level = []
         for i in range(0, len(current_nodes), 2):
@@ -96,7 +82,6 @@ def build_merkle(leaves):
     return tree_structure
 
 def prove_merkle(tree, index):
-    # Construct a proof of inclusion for a given leaf
     proof_path = []
     idx = index
     for level in tree[:-1]:
@@ -110,7 +95,6 @@ def prove_merkle(tree, index):
     return proof_path
 
 def select_unclaimed_leaf(w3, contract, leaves, total_leaves):
-    # Attempt to select an unclaimed leaf from the Merkle tree
     for _ in range(10000):
         idx = random.randint(1, total_leaves - 1)
         leaf_prime = int.from_bytes(leaves[idx], 'big')
@@ -138,7 +122,6 @@ def send_signed_msg(w3, contract, proof, chosen_leaf):
         print("Error: 'submit' function not found in the contract ABI.")
         return '0x'
 
-    # Build and send the transaction
     try:
         tx = submit_function(proof, chosen_leaf).build_transaction({
             'from': account.address,
@@ -155,7 +138,6 @@ def send_signed_msg(w3, contract, proof, chosen_leaf):
         return '0x'
     return tx_hash.hex()
 
-# Reused helper functions for connecting, hashing, etc.
 def connect_to(chain):
     if chain == 'avax':
         api_url = "https://api.avax-test.network/ext/bc/C/rpc"
